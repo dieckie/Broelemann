@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Prim {
 
-    static int[] prim = new int[1000];
+    static int[] prim = new int[10000];
 
     public static void init() {
         int PrimBestimmung = 2;
@@ -29,7 +29,6 @@ public class Prim {
                 }
             }
         }
-        System.out.println("rrready");
     }
 
     public static List<Integer> primfaktorzerlegung(int n) {

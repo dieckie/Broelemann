@@ -17,23 +17,52 @@ public class Main {
     static Pair debug;
 
     public static void main(String[] args) throws Exception {
+        Timer t = new Timer();
+        t.start();
+        Timer t2 = new Timer();
+        t2.start();
         Prim.init();
+        Permute.init();
         generatePairs();
-        // generateSums();
-        // generatePros();
-        printSize("Direkt nach generieren");
-        for(Iterator<Pair> iterator = pairs.iterator(); iterator.hasNext();) {
-            Pair p = iterator.next();
-            Broele b = new Broele(p.pro);
-            Lueking l = new Lueking(p.sum);
+        generateSums();
+        generatePros();
+        System.out.println("Initphase: " + t2.formatTime());
+        t2.reset();
+        printSize("Direkt nach generieren", null);
+        for(Iterator<Integer> it = pros.keySet().iterator(); it.hasNext();) {
+            int p = it.next();
+            Broele b = new Broele(p);
+            if(p == 4672) {
+                b.debug(true);
+            }
             if(!b.check1()) {
-                iterator.remove();
-
-            } else if(!l.check1()) {
-                iterator.remove();
+                pros.replace(p, false);
+            } else if(!b.check2()) {
+                pros.replace(p, false);
             }
         }
-        printSize("Ende");
+        System.out.println("Broele.check: " + t2.formatTime());
+        t2.restart();
+        refreshPros();
+        printSize("Nach Broele.check", null);
+        System.out.println("Broele.check sync: " + t2.formatTime());
+        if(!pairs.contains(debug)) {
+            throw new Exception("Das richtige Zahlenpaar war am Ende nicht dabei!");
+        }
+        t2.restart();
+        for(Iterator<Integer> it = sums.keySet().iterator(); it.hasNext();) {
+            int s = it.next();
+            Lueking l = new Lueking(s);
+            if(!l.check1()) {
+                sums.replace(s, false);
+            }
+        }
+        System.out.println("Lueking.check1: " + t2.formatTime());
+        t2.restart();
+        refreshSums();
+        printSize("Nach Lueking.check1", null);
+        System.out.println("Lueking.check1 sync: " + t2.formatTime());
+        t2.restart();
         if(!pairs.contains(debug)) {
             throw new Exception("Das richtige Zahlenpaar war am Ende nicht dabei!");
         }
@@ -57,6 +86,7 @@ public class Main {
         for(Pair p : pairs) {
             if(!sumsP.containsKey(p.sum)) {
                 sumsP.put(p.sum, new HashSet<Pair>());
+                sums.put(p.sum, true);
             }
             sumsP.get(p.sum).add(p);
         }
@@ -66,24 +96,79 @@ public class Main {
         for(Pair p : pairs) {
             if(!prosP.containsKey(p.pro)) {
                 prosP.put(p.pro, new HashSet<Pair>());
+                pros.put(p.pro, true);
             }
             prosP.get(p.pro).add(p);
         }
     }
 
-    public static void printSize(String message) {
-        // int sumsSize = 0, prosSize = 0;
-        // for(int i = 0; i <= 1000000; i++) {
-        // if(sums.containsKey(i)) {
-        // sumsSize += sums.get(i).size();
-        // }
-        // if(pros.containsKey(i)) {
-        // prosSize += pros.get(i).size();
-        // }
-        // }
+    public static void refreshPros() {
+        long time = System.currentTimeMillis();
+        int i = 0;
+        for(int p : pros.keySet()) {
+            if(!pros.get(p)) {
+                // if(prosP.containsKey(p)) {
+                for(Pair pa : prosP.get(p)) {
+                    pairs.remove(pa);
+                }
+                // prosP.remove(p);
+                // }
+            }
+            i++;
+            if(System.currentTimeMillis() - time > 10000){
+                System.out.println(((float)i / pros.size()) * 100 + "%");
+                time = System.currentTimeMillis();
+            }
+        }
+    }
+
+    public static void refreshSums() {
+        long time = System.currentTimeMillis();
+        int i = 0;
+        for(int p : sums.keySet()) {
+            if(!sums.get(p)) {
+                // if(sumsP.containsKey(p)) {
+                for(Pair pa : sumsP.get(p)) {
+                    pairs.remove(pa);
+                }
+                // sumsP.remove(p);
+                // }
+            }
+            i++;
+            if(System.currentTimeMillis() - time > 10000){
+                System.out.println(((float)i / sums.size()) * 100 + "%");
+                time = System.currentTimeMillis();
+            }
+        }
+    }
+
+    public static void printSize(String message, Timer t) {
+        int sumsSize = 0, prosSize = 0;
+        int sumsTrue = 0, prosTrue = 0;
+        for(int i = 0; i <= 1000000; i++) {
+            if(sumsP.containsKey(i)) {
+                sumsSize += sumsP.get(i).size();
+            }
+            if(prosP.containsKey(i)) {
+                prosSize += prosP.get(i).size();
+            }
+        }
+        for(Iterator<Integer> it = pros.keySet().iterator(); it.hasNext();) {
+            if(pros.get(it.next())) {
+                prosTrue++;
+            }
+        }
+        for(Iterator<Integer> it = sums.keySet().iterator(); it.hasNext();) {
+            if(sums.get(it.next())) {
+                sumsTrue++;
+            }
+        }
         System.out.println(message);
         System.out.println("\tpairs:" + pairs.size());
-        // System.out.println("\tsums: " + sumsSize + "/" + sums.size());
-        // System.out.println("\tpros: " + prosSize + "/" + pros.size());
+        System.out.println("\tsums: " + sumsSize + "/" + sumsP.size() + "(" + sumsTrue + "/" + sums.size() + ")");
+        System.out.println("\tpros: " + prosSize + "/" + prosP.size() + "(" + prosTrue + "/" + pros.size() + ")");
+        if(t != null) {
+            System.out.println("\t" + t.formatTime());
+        }
     }
 }
