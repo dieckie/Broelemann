@@ -20,12 +20,31 @@ public class Broele {
     }
 
     public boolean check1() {
-        return !Prim.isPrim(product);
+        if(debug) {
+            System.out.println("b.check2(" + product + ")");
+        }
+        List<Integer> prim = Prim.primfaktorzerlegung(product);
+        if(prim.size() == 1) {
+            System.out.println("[1, " + prim.get(0) + "];");
+            if(product > 1000) {
+                System.err.println("Wie kann die Zahl hier größer als 1000 sein?");
+            }
+            return false;
+        } else if(prim.size() == 2 && product > 1000) {
+            System.out.println("[" + prim.get(0) + ", " + prim.get(1) + "];");
+            return false;
+        } else {
+            System.out.println("[1 ," + prim.get(0) * prim.get(1) + "];[" + prim.get(0) + ", " + prim.get(1) + "];...");
+            return true;
+        }
     }
 
     public boolean check2() {
+        if(debug) {
+            System.out.println("b.check2(" + product + ")");
+        }
         List<Integer> prim = Prim.primfaktorzerlegung(product);
-        if(product == 4672) {
+        if(debug) {
             System.out.println(prim);
         }
         Set<Pair> possible = new HashSet<Pair>();
@@ -77,5 +96,4 @@ public class Broele {
         }
         return possible.size() == 1;
     }
-
 }

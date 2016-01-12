@@ -12,57 +12,71 @@ public class Main {
     static List<Pair> pairs = new ArrayList<Pair>();
     static Map<Integer, HashSet<Pair>> sumsP = new HashMap<Integer, HashSet<Pair>>();
     static Map<Integer, HashSet<Pair>> prosP = new HashMap<Integer, HashSet<Pair>>();
+    static Map<Integer, HashSet<Pair>> difsP = new HashMap<Integer, HashSet<Pair>>();
     static Map<Integer, Boolean> sums = new HashMap<Integer, Boolean>();
     static Map<Integer, Boolean> pros = new HashMap<Integer, Boolean>();
+    static Map<Integer, Boolean> difs = new HashMap<Integer, Boolean>();
     static Pair debug;
 
     public static void main(String[] args) throws Exception {
-        Timer t = new Timer();
-        t.start();
-        Timer t2 = new Timer();
-        t2.start();
         Prim.init();
         Permute.init();
         generatePairs();
-        generateSums();
-        generatePros();
+        debug();
+    }
+
+    public static void debug() {
+        Pair p = new Pair(1, 4);
+        Broele b = new Broele(p.pro);
+        Lueking l = new Lueking(p.sum);
+        b.debug(true);
+        l.debug(true);
+        if(!b.check1()) {
+            System.out.println("Removed in b.check1()");
+        } else if(!l.check1()) {
+            System.out.println("Removed in l.check1()");
+        } else if(!b.check2()) {
+            System.out.println("Removed in b.check2()");
+        } else if(!l.check2()) {
+            System.out.println("Removed in l.check2()");
+        }
+    }
+
+    public static void seach() throws Exception {
+        Timer t2 = new Timer();
+        t2.start();
         System.out.println("Initphase: " + t2.formatTime());
-        t2.reset();
+        t2.restart();
         printSize("Direkt nach generieren", null);
-        for(Iterator<Integer> it = pros.keySet().iterator(); it.hasNext();) {
-            int p = it.next();
-            Broele b = new Broele(p);
-            if(p == 4672) {
+        long time = System.currentTimeMillis();
+        int i = 0;
+        float teiler = pairs.size() / 100f;
+        for(Iterator<Pair> it = pairs.iterator(); it.hasNext();) {
+            Pair p = it.next();
+            Broele b = new Broele(p.pro);
+            Lueking l = new Lueking(p.sum);
+            if(p.equals(debug)) {
                 b.debug(true);
+                l.debug(true);
             }
             if(!b.check1()) {
-                pros.replace(p, false);
+                it.remove();
+            } else if(!l.check1()) {
+                it.remove();
             } else if(!b.check2()) {
-                pros.replace(p, false);
+                it.remove();
+            } else if(!l.check2()) {
+                it.remove();
+            }
+            i++;
+            if(System.currentTimeMillis() - time > 10000) {
+                System.out.println((float) i / teiler + "%");
+                time = System.currentTimeMillis();
             }
         }
-        System.out.println("Broele.check: " + t2.formatTime());
-        t2.restart();
-        refreshPros();
-        printSize("Nach Broele.check", null);
-        System.out.println("Broele.check sync: " + t2.formatTime());
-        if(!pairs.contains(debug)) {
-            throw new Exception("Das richtige Zahlenpaar war am Ende nicht dabei!");
-        }
-        t2.restart();
-        for(Iterator<Integer> it = sums.keySet().iterator(); it.hasNext();) {
-            int s = it.next();
-            Lueking l = new Lueking(s);
-            if(!l.check1()) {
-                sums.replace(s, false);
-            }
-        }
-        System.out.println("Lueking.check1: " + t2.formatTime());
-        t2.restart();
-        refreshSums();
-        printSize("Nach Lueking.check1", null);
-        System.out.println("Lueking.check1 sync: " + t2.formatTime());
-        t2.restart();
+        generateDifs();
+        System.out.println(difsP);
+        printSize("Ende", t2);
         if(!pairs.contains(debug)) {
             throw new Exception("Das richtige Zahlenpaar war am Ende nicht dabei!");
         }
@@ -102,6 +116,16 @@ public class Main {
         }
     }
 
+    public static void generateDifs() {
+        for(Pair p : pairs) {
+            if(!difsP.containsKey(p.dif)) {
+                difsP.put(p.dif, new HashSet<Pair>());
+                difs.put(p.dif, true);
+            }
+            difsP.get(p.dif).add(p);
+        }
+    }
+
     public static void refreshPros() {
         long time = System.currentTimeMillis();
         int i = 0;
@@ -115,8 +139,8 @@ public class Main {
                 // }
             }
             i++;
-            if(System.currentTimeMillis() - time > 10000){
-                System.out.println(((float)i / pros.size()) * 100 + "%");
+            if(System.currentTimeMillis() - time > 10000) {
+                System.out.println(((float) i / pros.size()) * 100 + "%");
                 time = System.currentTimeMillis();
             }
         }
@@ -135,8 +159,8 @@ public class Main {
                 // }
             }
             i++;
-            if(System.currentTimeMillis() - time > 10000){
-                System.out.println(((float)i / sums.size()) * 100 + "%");
+            if(System.currentTimeMillis() - time > 10000) {
+                System.out.println(((float) i / sums.size()) * 100 + "%");
                 time = System.currentTimeMillis();
             }
         }
