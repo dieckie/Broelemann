@@ -22,7 +22,8 @@ public class Main {
         Prim.init();
         Permute.init();
         generatePairs();
-        debug();
+        search();
+//        debug();
     }
 
     public static void debug() {
@@ -42,7 +43,7 @@ public class Main {
         }
     }
 
-    public static void seach() throws Exception {
+    public static void search() throws Exception {
         Timer t2 = new Timer();
         t2.start();
         System.out.println("Initphase: " + t2.formatTime());
@@ -50,23 +51,36 @@ public class Main {
         printSize("Direkt nach generieren", null);
         long time = System.currentTimeMillis();
         int i = 0;
+        int b1 = 0, l1 = 0, b2 = 0, l2 = 0;
         float teiler = pairs.size() / 100f;
         for(Iterator<Pair> it = pairs.iterator(); it.hasNext();) {
             Pair p = it.next();
             Broele b = new Broele(p.pro);
             Lueking l = new Lueking(p.sum);
             if(p.equals(debug)) {
-                b.debug(true);
-                l.debug(true);
+                //b.debug(true);
+                //l.debug(true);
             }
             if(!b.check1()) {
                 it.remove();
+                b1++;
+                if(p.equals(debug))
+                    System.out.println("Removed in b.check1()");
             } else if(!l.check1()) {
                 it.remove();
+                l1++;
+                if(p.equals(debug))
+                    System.out.println("Removed in l.check1()");
             } else if(!b.check2()) {
                 it.remove();
+                b2++;
+                if(p.equals(debug))
+                    System.out.println("Removed in b.check2()");
             } else if(!l.check2()) {
                 it.remove();
+                l2++;
+                if(p.equals(debug))
+                    System.out.println("Removed in l.check2()");
             }
             i++;
             if(System.currentTimeMillis() - time > 10000) {
@@ -76,6 +90,7 @@ public class Main {
         }
         generateDifs();
         System.out.println(difsP);
+        System.out.println("Removed: b1(" + b1 + "), l1("+ l1 + "), b2("+ b2 + "), l2(" + l2 + ")");
         printSize("Ende", t2);
         if(!pairs.contains(debug)) {
             throw new Exception("Das richtige Zahlenpaar war am Ende nicht dabei!");

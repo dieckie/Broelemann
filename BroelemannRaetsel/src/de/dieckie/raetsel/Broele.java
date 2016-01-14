@@ -20,33 +20,38 @@ public class Broele {
     }
 
     public boolean check1() {
-        if(debug) {
-            System.out.println("b.check2(" + product + ")");
-        }
+        if(debug)
+            System.out.println("b.check1(" + product + ")");
+
         List<Integer> prim = Prim.primfaktorzerlegung(product);
         if(prim.size() == 1) {
-            System.out.println("[1, " + prim.get(0) + "];");
+            if(debug)
+                System.out.println("[1, " + prim.get(0) + "];");
             if(product > 1000) {
                 System.err.println("Wie kann die Zahl hier größer als 1000 sein?");
             }
             return false;
         } else if(prim.size() == 2 && product > 1000) {
-            System.out.println("[" + prim.get(0) + ", " + prim.get(1) + "];");
+            if(debug)
+                System.out.println("[" + prim.get(0) + ", " + prim.get(1) + "];");
             return false;
         } else {
-            System.out.println("[1 ," + prim.get(0) * prim.get(1) + "];[" + prim.get(0) + ", " + prim.get(1) + "];...");
+            if(debug)
+                System.out.println("[1 ," + prim.get(0) * prim.get(1) + "];[" + prim.get(0) + ", " + prim.get(1) + "];...");
             return true;
         }
     }
-
+    
     public boolean check2() {
-        if(debug) {
+        return check2(product);
+    }
+
+    public boolean check2(int product) {
+        if(debug)
             System.out.println("b.check2(" + product + ")");
-        }
         List<Integer> prim = Prim.primfaktorzerlegung(product);
-        if(debug) {
+        if(debug)
             System.out.println(prim);
-        }
         Set<Pair> possible = new HashSet<Pair>();
         for(ArrayList<Boolean> l : Permute.permutions[prim.size()]) {
             int pro1 = 1, pro2 = 1;
@@ -75,14 +80,12 @@ public class Broele {
         for(Iterator<Pair> it = possible.iterator(); it.hasNext();) {
             Pair p = it.next();
             int sum = p.sum;
-            if(debug) {
+            if(debug)
                 System.out.println(p + " " + p.sum);
-            }
             out: for(int i = 1; i <= sum / 2; i++) {
                 if((Prim.isPrim(i) && Prim.isPrim(sum - i))) {
-                    if(debug) {
+                    if(debug)
                         System.out.println(p + ": " + i + " " + (sum - i));
-                    }
                     if(i * (sum - i) > 1000) {
                         it.remove();
                         break out;
@@ -95,5 +98,20 @@ public class Broele {
             }
         }
         return possible.size() == 1;
+    }
+    
+    public boolean luekingCheck2(int sum) {
+        if(debug)
+            System.out.println("l.check2(" + sum + ")");
+        int count = 0;
+        for(int i = 1; i <= sum / 2; i++) {
+            if(check2(i * (sum - i))) {
+                count++;
+            }
+            if(count >= 2) {
+                return false;
+            }
+        }
+        return count == 1;
     }
 }

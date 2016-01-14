@@ -20,44 +20,28 @@ public class Lueking {
     }
 
     public boolean check1() {
-        if(debug) {
+        if(debug)
             System.out.println("l.check1(" + sum + ")");
-        }
         int count = 0;
         String output = "";
         for(int i = 1; i <= sum / 2; i++) {
-            output += i + ", " + (sum - i) + ": ";
-            if(Prim.isPrim(i) && (sum - i == 1)) {
+            if(broeleCheck1(i * (sum - i), "\t" + i + ", " + (sum - i) + ": ")) {
                 count++;
-                System.out.println("[1, " + i + "];\n");
-            } else if(Prim.isPrim(sum - i) && (i == 1)) {
-                count++;
-                System.out.println("[1, " + (sum - i) + "];\n");
-            } else if((Prim.isPrim(i) && Prim.isPrim(sum - i))) {
-                output += "[" + i + ", " + (sum - i) + "];\n";
-                if(i * (sum - i) > 1000) {
-                    count++;
-                }
-            } else {
-                output += ("[1 ," + i * (sum - i) + "];[" + i + ", " + (sum - i) + "];...\n");
             }
             if(count >= 2) {
-                if(debug) {
-                    System.out.println(output);
-                }
+                if(debug)
+                    System.out.println(output + "\ntrue");
                 return true;
             }
         }
-        if(debug) {
-            System.out.println(output);
-        }
+        if(debug)
+            System.out.println(output + "\n" + (count != 1));
         return count != 1;
     }
 
     public boolean check2() {
-        if(debug) {
+        if(debug)
             System.out.println("l.check2(" + sum + ")");
-        }
         int count = 0;
         for(int i = 1; i <= sum / 2; i++) {
             if(broeleCheck2(i * (sum - i))) {
@@ -69,23 +53,20 @@ public class Lueking {
         }
         return count == 1;
     }
-    
+
     private boolean broeleCheck1(int product, String before) {
-        if(debug) {
-            System.out.println("b.check2(" + product + ")");
-        }
         List<Integer> prim = Prim.primfaktorzerlegung(product);
         if(prim.size() == 1) {
-            System.out.println("[1, " + prim.get(0) + "];");
-            if(product > 1000) {
-                System.err.println("Wie kann die Zahl hier größer als 1000 sein?");
-            }
+            if(debug)
+                System.out.println(before + "[1, " + prim.get(0) + "];");
             return false;
         } else if(prim.size() == 2 && product > 1000) {
-            System.out.println("[" + prim.get(0) + ", " + prim.get(1) + "];");
+            if(debug)
+                System.out.println(before + "[" + prim.get(0) + ", " + prim.get(1) + "];");
             return false;
         } else {
-            System.out.println("[1 ," + prim.get(0) * prim.get(1) + "];[" + prim.get(0) + ", " + prim.get(1) + "];...");
+            if(debug)
+                System.out.println(before + "[1 ," + prim.get(0) * prim.get(1) + "];[" + prim.get(0) + ", " + prim.get(1) + "];...");
             return true;
         }
     }
@@ -115,9 +96,8 @@ public class Lueking {
                 }
                 if(!contains) {
                     possible.add(p);
-                    if(debug) {
+                    if(debug)
                         System.out.println(p);
-                    }
                 }
 
             }
@@ -125,14 +105,12 @@ public class Lueking {
         for(Iterator<Pair> it = possible.iterator(); it.hasNext();) {
             Pair p = it.next();
             int sum = p.sum;
-            if(debug) {
+            if(debug)
                 System.out.println(p + " " + p.sum);
-            }
             out: for(int i = 1; i <= sum / 2; i++) {
                 if((Prim.isPrim(i) && Prim.isPrim(sum - i))) {
-                    if(debug) {
+                    if(debug)
                         System.out.println(p + ": " + i + " " + (sum - i));
-                    }
                     if(i * (sum - i) > 1000) {
                         it.remove();
                         break out;
