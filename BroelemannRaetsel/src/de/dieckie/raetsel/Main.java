@@ -27,7 +27,7 @@ public class Main {
     }
 
     public static void debug() {
-        Pair p = new Pair(1, 4);
+        Pair p = new Pair(64, 73);
         Broele b = new Broele(p.pro);
         Lueking l = new Lueking(p.sum);
         b.debug(true);

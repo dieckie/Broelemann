@@ -18,14 +18,18 @@ public class Lueking {
     public void debug(boolean debug) {
         this.debug = debug;
     }
-
+    
     public boolean check1() {
+        return check1(sum);
+    }
+
+    public boolean check1(int sum) {
         if(debug)
             System.out.println("l.check1(" + sum + ")");
         int count = 0;
         String output = "";
         for(int i = 1; i <= sum / 2; i++) {
-            if(broeleCheck1(i * (sum - i), "\t" + i + ", " + (sum - i) + ": ")) {
+            if(!broeleCheck1(i * (sum - i), "\t" + i + ", " + (sum - i) + ": ")) {
                 count++;
             }
             if(count >= 2) {
